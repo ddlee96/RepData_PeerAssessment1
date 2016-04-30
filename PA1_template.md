@@ -88,7 +88,7 @@ use sum function and group by date
 ```r
 table <- Act %>%
   group_by(date) %>%
-  summarise(total_step=sum(steps, na.rm=TRUE))
+  summarise(total_step=sum(steps))
 
 # explore table
 table
@@ -99,14 +99,14 @@ table
 ## 
 ##          date total_step
 ##        (fctr)      (int)
-## 1  2012-10-01          0
+## 1  2012-10-01         NA
 ## 2  2012-10-02        126
 ## 3  2012-10-03      11352
 ## 4  2012-10-04      12116
 ## 5  2012-10-05      13294
 ## 6  2012-10-06      15420
 ## 7  2012-10-07      11015
-## 8  2012-10-08          0
+## 8  2012-10-08         NA
 ## 9  2012-10-09      12811
 ## 10 2012-10-10       9900
 ## ..        ...        ...
@@ -116,7 +116,7 @@ table
 use base plot system  
 
 ```r
-hist(table$total_step, main = "Histogram of Total Steps Per Day",
+hist(table$total_step, breaks = 50, main = "Histogram of Total Steps Per Day",
      xlab = "total steps")
 ```
 
@@ -125,10 +125,10 @@ hist(table$total_step, main = "Histogram of Total Steps Per Day",
 ### Calculate the mean and median
 
 ```r
-step_mean <- mean(table$total_step, na.rm = TRUE)
-step_median <- median(table$total_step, na.rm = TRUE)
+step_mean <- as.integer(mean(table$total_step, na.rm = TRUE))
+step_median <- as.integer(median(table$total_step, na.rm = TRUE))
 ```
-The mean of total steps taken per day is 9354.2295082, and the median is 10395.
+The mean of total steps taken per day is 10766, and the median is 10765.
 
 ## What is the average daily activity pattern?  
 ### Prepare table for average steps across days of every 5-min interval
@@ -232,20 +232,20 @@ table3 <- Act2 %>%
   summarise(total_step=sum(steps))
 
 # plot histogram
-hist(table3$total_step, main = "Histogram of Total Steps Per Day",
+hist(table3$total_step, breaks = 50, main = "Histogram of Total Steps Per Day",
      xlab = "total steps")
 ```
 
 ![](PA1_template_files/figure-html/make histogram & calculate mean and median-1.png)
 
 ```r
-step_mean2 <- mean(table3$total_step)
-step_median2 <- median(table3$total_step)
+step_mean2 <- as.integer(mean(table3$total_step))
+step_median2 <- as.integer(median(table3$total_step))
 ```
-The mean of total steps taken per day is 1.0766189\times 10^{4}, and the median is 1.0766189\times 10^{4}.   
+The mean of total steps taken per day is 10766, and the median is 10766.   
 
 ### Coclusion
-Compared with those with missing values included, it seems mean and median are both larger, and the frequency is more likely normal distributed.
+Compared with those with missing values included, it seems mean and median changed slightly, and the frequency is more likely normal distributed.
 
 ## Are there differences in activity patterns between weekdays and weekends?
 ### Find weekends in dates give
@@ -270,9 +270,10 @@ summarise(aver_step=mean(steps))
 
 ## make plot
 g <- ggplot(data = table4)
-g + geom_line(aes(x = interval, y = aver_step)) + facet_grid(weekday~.)
+g + geom_line(aes(x = interval, y = aver_step)) + facet_wrap(~weekday, nrow = 2)
 ```
 
 ![](PA1_template_files/figure-html/plot comparison-1.png)
+
 ### Conclusion
 There are more steps taken in weekends than in weekdays.

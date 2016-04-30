@@ -32,7 +32,7 @@ use sum function and group by date
 ```{r prepare, echo = TRUE}
 table <- Act %>%
   group_by(date) %>%
-  summarise(total_step=sum(steps, na.rm=TRUE))
+  summarise(total_step=sum(steps))
 
 # explore table
 table
@@ -41,14 +41,14 @@ table
 ### Plot the histogram of the total steps taken each day
 use base plot system  
 ```{r hist plot, echo = TRUE}
-hist(table$total_step, main = "Histogram of Total Steps Per Day",
+hist(table$total_step, breaks = 50, main = "Histogram of Total Steps Per Day",
      xlab = "total steps")
 ```
 
 ### Calculate the mean and median
 ```{r mean&median, echo = TRUE}
-step_mean <- mean(table$total_step, na.rm = TRUE)
-step_median <- median(table$total_step, na.rm = TRUE)
+step_mean <- as.integer(mean(table$total_step, na.rm = TRUE))
+step_median <- as.integer(median(table$total_step, na.rm = TRUE))
 ```
 The mean of total steps taken per day is `r step_mean`, and the median is `r step_median`.
 
@@ -109,15 +109,15 @@ table3 <- Act2 %>%
   summarise(total_step=sum(steps))
 
 # plot histogram
-hist(table3$total_step, main = "Histogram of Total Steps Per Day",
+hist(table3$total_step, breaks = 50, main = "Histogram of Total Steps Per Day",
      xlab = "total steps")
-step_mean2 <- mean(table3$total_step)
-step_median2 <- median(table3$total_step)
+step_mean2 <- as.integer(mean(table3$total_step))
+step_median2 <- as.integer(median(table3$total_step))
 ```
 The mean of total steps taken per day is `r step_mean2`, and the median is `r step_median2`.   
 
 ### Coclusion
-Compared with those with missing values included, it seems mean and median are both larger, and the frequency is more likely normal distributed.
+Compared with those with missing values included, it seems mean and median changed slightly, and the frequency is more likely normal distributed.
 
 ## Are there differences in activity patterns between weekdays and weekends?
 ### Find weekends in dates give
@@ -139,7 +139,8 @@ summarise(aver_step=mean(steps))
 
 ## make plot
 g <- ggplot(data = table4)
-g + geom_line(aes(x = interval, y = aver_step)) + facet_grid(weekday~.)
+g + geom_line(aes(x = interval, y = aver_step)) + facet_wrap(~weekday, nrow = 2)
 ```
+
 ### Conclusion
 There are more steps taken in weekends than in weekdays.
