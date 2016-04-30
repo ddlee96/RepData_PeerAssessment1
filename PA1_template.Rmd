@@ -32,7 +32,7 @@ use sum function and group by date
 ```{r prepare, echo = TRUE}
 table <- Act %>%
   group_by(date) %>%
-  summarise(total_step=sum(steps))
+  summarise(total_step=sum(steps, na.rm = TRUE))
 
 # explore table
 table
@@ -117,7 +117,7 @@ step_median2 <- as.integer(median(table3$total_step))
 The mean of total steps taken per day is `r step_mean2`, and the median is `r step_median2`.   
 
 ### Coclusion
-Compared with those with missing values included, it seems mean and median changed slightly, and the frequency is more likely normal distributed.
+Compared with those with missing values included, it seems mean changed a lot while median changed slightly, and the frequency is more likely normal distributed.
 
 ## Are there differences in activity patterns between weekdays and weekends?
 ### Find weekends in dates give

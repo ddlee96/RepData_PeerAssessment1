@@ -88,7 +88,7 @@ use sum function and group by date
 ```r
 table <- Act %>%
   group_by(date) %>%
-  summarise(total_step=sum(steps))
+  summarise(total_step=sum(steps, na.rm = TRUE))
 
 # explore table
 table
@@ -99,14 +99,14 @@ table
 ## 
 ##          date total_step
 ##        (fctr)      (int)
-## 1  2012-10-01         NA
+## 1  2012-10-01          0
 ## 2  2012-10-02        126
 ## 3  2012-10-03      11352
 ## 4  2012-10-04      12116
 ## 5  2012-10-05      13294
 ## 6  2012-10-06      15420
 ## 7  2012-10-07      11015
-## 8  2012-10-08         NA
+## 8  2012-10-08          0
 ## 9  2012-10-09      12811
 ## 10 2012-10-10       9900
 ## ..        ...        ...
@@ -128,7 +128,7 @@ hist(table$total_step, breaks = 50, main = "Histogram of Total Steps Per Day",
 step_mean <- as.integer(mean(table$total_step, na.rm = TRUE))
 step_median <- as.integer(median(table$total_step, na.rm = TRUE))
 ```
-The mean of total steps taken per day is 10766, and the median is 10765.
+The mean of total steps taken per day is 9354, and the median is 10395.
 
 ## What is the average daily activity pattern?  
 ### Prepare table for average steps across days of every 5-min interval
@@ -245,7 +245,7 @@ step_median2 <- as.integer(median(table3$total_step))
 The mean of total steps taken per day is 10766, and the median is 10766.   
 
 ### Coclusion
-Compared with those with missing values included, it seems mean and median changed slightly, and the frequency is more likely normal distributed.
+Compared with those with missing values included, it seems mean changed a lot while median changed slightly, and the frequency is more likely normal distributed.
 
 ## Are there differences in activity patterns between weekdays and weekends?
 ### Find weekends in dates give
