@@ -1,6 +1,6 @@
 # Reproducible Research: Peer Assessment 1
 ## Preface
-In this report, I
+In this report, I explored and visualized some patterns of steps taken per day.
 
 ## Load library
 
@@ -130,8 +130,8 @@ step_median <- median(table$total_step, na.rm = TRUE)
 ```
 The mean of total steps taken per day is 9354.2295082, and the median is 10395.
 
-## What is the average daily activity pattern?
-prepare table for average steps across days of every 5-min interval
+## What is the average daily activity pattern?  
+### Prepare table for average steps across days of every 5-min interval
 
 ```r
 table2 <- Act %>%
@@ -139,7 +139,7 @@ group_by(interval) %>%
 summarise(aver_step=mean(steps, na.rm=TRUE))
 ```
 
-plot {daily activity pattern.
+### Plot {daily activity pattern.
 
 ```r
 qplot(interval, aver_step, data = table2, geom = "line")
@@ -147,21 +147,22 @@ qplot(interval, aver_step, data = table2, geom = "line")
 
 ![](PA1_template_files/figure-html/plot daily activity-1.png)
 
-find the interval with max steps taken.
+### Find the interval with max steps taken.
 
 ```r
 max_interval <- which.max(table2$aver_step)
 ```
-the interval with max steps taken is the 104th interval.  
+the interval with max steps taken is the 104th(identifier: 835) interval.  
 
 ## Imputing missing values
-Calculate the NA values in the dataset
+### Count the NA values in the dataset
 
 ```r
 count = sum(is.na(act$steps))
 ```
 There is 2304 NA values in the dataset.  
-Then find pattern of NA values
+
+### Find pattern of NA values
 
 ```r
 head(table(act$interval, is.na(act$steps)))
@@ -194,7 +195,7 @@ head(table(act$date, is.na(act$steps)))
 ```
 So, the missing values are related to date.
 
-Use mean of 5-min interval to fill the NA values
+### Use mean of 5-min interval to fill the NA values
 
 ```r
 # find the date whose record is missed
@@ -220,14 +221,15 @@ summary(act2)
 ##                   (Other)   :15840
 ```
 
-Make histogram, calculate the new mean and median
+### Make histogram, calculate the new mean and median
 
 ```r
 Act2 <- tbl_df(act2)
+
 # prepare for plot and calculation
 table3 <- Act2 %>%
   group_by(date) %>%
-  summarise(total_step=sum(steps, na.rm=TRUE))
+  summarise(total_step=sum(steps))
 
 # plot histogram
 hist(table3$total_step, main = "Histogram of Total Steps Per Day",
@@ -237,9 +239,40 @@ hist(table3$total_step, main = "Histogram of Total Steps Per Day",
 ![](PA1_template_files/figure-html/make histogram & calculate mean and median-1.png)
 
 ```r
-step_mean2 <- mean(table3$total_step, na.rm = TRUE)
-step_median2 <- median(table3$total_step, na.rm = TRUE)
+step_mean2 <- mean(table3$total_step)
+step_median2 <- median(table3$total_step)
 ```
-The mean of total steps taken per day is 1.0766189\times 10^{4}, and the median is 1.0766189\times 10^{4}. Compared with those with missing values included, it seems mean and median are both larger. 
+The mean of total steps taken per day is 1.0766189\times 10^{4}, and the median is 1.0766189\times 10^{4}.   
+
+### Coclusion
+Compared with those with missing values included, it seems mean and median are both larger, and the frequency is more likely normal distributed.
 
 ## Are there differences in activity patterns between weekdays and weekends?
+### Find weekends in dates give
+
+```r
+dates<-as.character(unique(act$date))
+weekends<-dates[weekdays(as.Date(dates)) == "星期日"| weekdays(as.Date(dates)) == "星期六"]
+```
+### Create new variables to identify weekdays and weekends
+
+```r
+Act2 <- mutate(Act2, weekday = (date %in% weekends))
+Act2$weekday = factor(Act2$weekday, labels = c("weekday", "weekend"))
+```
+### Plot comparison between weekdays and weekends
+
+```r
+# prepare table
+table4 <- Act2 %>%
+group_by(interval, weekday) %>%
+summarise(aver_step=mean(steps))
+
+## make plot
+g <- ggplot(data = table4)
+g + geom_line(aes(x = interval, y = aver_step)) + facet_grid(weekday~.)
+```
+
+![](PA1_template_files/figure-html/plot comparison-1.png)
+### Conclusion
+There are more steps taken in weekends than in weekdays.

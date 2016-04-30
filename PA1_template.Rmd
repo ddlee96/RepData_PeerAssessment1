@@ -5,7 +5,7 @@ output:
     keep_md: true
 ---
 ## Preface
-In this report, I
+In this report, I explored and visualized some patterns of steps taken per day.
 
 ## Load library
 ```{r load library, echo = TRUE}
@@ -69,7 +69,7 @@ qplot(interval, aver_step, data = table2, geom = "line")
 ```{r find max, echo = TRUE}
 max_interval <- which.max(table2$aver_step)
 ```
-the interval with max steps taken is the `r max_interval`th interval.  
+the interval with max steps taken is the `r max_interval`th(identifier: `r table2$interval[max_interval]`) interval.  
 
 ## Imputing missing values
 ### Count the NA values in the dataset
@@ -102,16 +102,17 @@ summary(act2)
 ### Make histogram, calculate the new mean and median
 ```{r make histogram & calculate mean and median, echo = TRUE}
 Act2 <- tbl_df(act2)
+
 # prepare for plot and calculation
 table3 <- Act2 %>%
   group_by(date) %>%
-  summarise(total_step=sum(steps, na.rm=TRUE))
+  summarise(total_step=sum(steps))
 
 # plot histogram
 hist(table3$total_step, main = "Histogram of Total Steps Per Day",
      xlab = "total steps")
-step_mean2 <- mean(table3$total_step, na.rm = TRUE)
-step_median2 <- median(table3$total_step, na.rm = TRUE)
+step_mean2 <- mean(table3$total_step)
+step_median2 <- median(table3$total_step)
 ```
 The mean of total steps taken per day is `r step_mean2`, and the median is `r step_median2`.   
 
@@ -119,3 +120,26 @@ The mean of total steps taken per day is `r step_mean2`, and the median is `r st
 Compared with those with missing values included, it seems mean and median are both larger, and the frequency is more likely normal distributed.
 
 ## Are there differences in activity patterns between weekdays and weekends?
+### Find weekends in dates give
+```{r find weekends, echo = TRUE}
+dates<-as.character(unique(act$date))
+weekends<-dates[weekdays(as.Date(dates)) == "星期日"| weekdays(as.Date(dates)) == "星期六"]
+```
+### Create new variables to identify weekdays and weekends
+```{r identify weekdays and weekends, echo = TRUE}
+Act2 <- mutate(Act2, weekday = (date %in% weekends))
+Act2$weekday = factor(Act2$weekday, labels = c("weekday", "weekend"))
+```
+### Plot comparison between weekdays and weekends
+```{r plot comparison, echo = TRUE}
+# prepare table
+table4 <- Act2 %>%
+group_by(interval, weekday) %>%
+summarise(aver_step=mean(steps))
+
+## make plot
+g <- ggplot(data = table4)
+g + geom_line(aes(x = interval, y = aver_step)) + facet_grid(weekday~.)
+```
+### Conclusion
+There are more steps taken in weekends than in weekdays.
